@@ -8,9 +8,9 @@ He describes five OOD principles in this book. They are collectively known as th
 
 Uncle Bob gives a definition of the Dependency Inversion Principle in his book. The definition is as the following:
 
-<center><h2>
+<div style="text-align: center;color:rgba(0,0,0,.68);font-weight: 400;font-style: italic;font-size: 30px;line-height: 1.48;">
 A. High-level modules should not depend on low-level modules. Both should depend on abstractions.
-</h2></center>
+</div>
 
 > B. Abstractions should not depend on details. Details should depend on abstractions.
 
