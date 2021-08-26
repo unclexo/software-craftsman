@@ -1,3 +1,5 @@
+![DIP: Dependency Inversion Principle](https://raw.githubusercontent.com/unclexo/articles/main/assets/solid/dependency-inversion-principle.jpg)
+
 # DIP: Dependency Inversion Principle
 
 DIP stands for Dependency Inversion Principle. It is one of the principles of Object-Oriented Design. Robert Cecil Martin¹ (widely known as Uncle Bob) introduces a number of principles in his famous book:
