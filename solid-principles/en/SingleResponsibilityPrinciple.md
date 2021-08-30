@@ -282,25 +282,23 @@ class Contact
 }
 
 ```
+We remove `validate()` and `sendEmail()` methods. We add two extra methods to make our app work. We add an accessor method to access user data. We add another method for overloading properties so that we can use object operator `->` to access properties. For example, `$contact->firstName`.
 
-We remove `validate()` and `sendEmail()` methods. We add two extra methods to make our app work. We add an accessor method to access user data. We add another method for overloading properties so that we can use object operator -> to access properties. For example, `$contact->firstName`.
-
-One important thing is to NOTE that this Contact class is not a production ready class and does not fit all. But you can play around with it. The design of a class depends on the application you are working with.
+One important thing is to NOTE that this Contact class is not a production-ready class and does not fit all. But you can play around with it. The design of a class depends on the application you are working with.
 
 Now our Contact class is conforming to SRP. It has also a high Cohesion. This means the Contact class can easily be testable. To prove it you can test both Contact classes. You will understand the difference then. This can be reused across the app. Cast this Contact class to your next developers. They do not have to deal with validation and email sending but only preparing contact data. I think you get the idea.
 
-
 ## How to Find Responsibilities?
-Well, you already know what behaviors are in context of a class: methods. Try to figure out tasks have been assigned to methods. This technique will give you some idea. Otherwise, you should write doc block for each and every method describing its purpose. This is absolutely mandatory to get the responsibilities from a class.
+Well, you already know what behaviors are in the context of a class: methods. Try to figure out tasks that have been assigned to methods. This technique will give you some idea. Otherwise, you should write a doc block for each and every method describing its purpose. This is absolutely mandatory to get the responsibilities from a class.
 
 Keep in mind, together a set of methods can represent a single responsibility instead of multiple responsibilities.
 
-Try to understand whether methods have any dependencies. If so, they might be different contexts. Dependencies may become different contexts in the context of your class. Try to change any contexts you are dealing with. Then try to see whether that changes affects other classes. If it does, you get the responsibility. Jump with SRP onto that class.
+Try to understand whether methods have any dependencies. If so, they might be different contexts. Dependencies may become different contexts in the context of your class. Try to change any contexts you are dealing with. Then try to see whether that change affects other classes. If it does, you get the responsibility. Jump with SRP onto that class.
 
 ## Summary
-Let us recap! We tried to understand what SRP is. To grasp SRP we needed to find out responsibilities of the Contact class in the context of SRP. We found more than one responsibility in our class which violates SRP. That is why we applied SRP onto our class to separate those responsibilities from our class.
+Let us recap! We tried to understand what SRP is. To grasp SRP we needed to find out the responsibilities of the Contact class in the context of SRP. We found more than one responsibility in our class that violates SRP. That is why we applied SRP to our class to separate those responsibilities from our class.
 
-Do you really need to apply SRP onto a class? It depends on how your class or module is changing. If you find more than one responsibility in your class and changes to one responsibility do not affect other classes, then you do not need to apply SRP onto a class. Finally, we will not forget Uncle Bob. He says:
+Do you really need to apply SRP to a class? It depends on how your class or module is changing. If you find more than one responsibility in your class and changes to one responsibility do not affect other classes, then you do not need to apply SRP to a class. Finally, we will not forget Uncle Bob. He says:
 
 > Finding and separating those responsibilities from one another is much of what software design is really about.
 
