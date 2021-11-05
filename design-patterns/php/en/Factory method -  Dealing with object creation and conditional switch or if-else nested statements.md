@@ -1,9 +1,11 @@
+![The Factory Method Pattern - Cover Photo](https://raw.githubusercontent.com/unclexo/articles/main/assets/design-patterns/factory-method/the-factory-method-pattern-cover-photo.jpg)
+
 # Factory method -  Dealing with object creation and conditional switch or if-else nested statements
 
 In this article, we will discuss the Factory Method design pattern. We will know why we need the design pattern, how the pattern solves specific design problems, how the pattern helps establish encapsulation.
 
 ### The Problem
-We will start with the problem. The problem we will discuss is the switch or if-else nested statements. Let us say, we have an if-else nested statement that **creates objects** in the client.
+We will start with the problem. The problem we will discuss is the switch or if-else nested statements. Let us say, we have an if-else nested statement that **creates objects** in the client code.
 
 Is there any developer who has NOT dealt with if-else or switch nested statements? Be it small or large! I think the answer is NO. Every developer has used it. 
 
@@ -59,7 +61,7 @@ This is the kind of approach amateur developers do. And the software firms that 
  
 **So what is wrong with that?**
 
-Problem 1: This approach has problems when we use it in our code. Why? The client code that uses the if-else nested statements for creating payment gateway objects deals with concrete classes  - `new Paypal()`, `new Stripe()`, etc. So it tightly couples those objects to the client code  -  the `PaymentController` class. It violates software design principles: **Loose coupling** and **Program to an interface, not an implementation**.
+Problem 1: This approach has problems when we use it in our client code. Why? The client code that uses the if-else nested statements for creating payment gateway objects deals with concrete classes  - `new Paypal()`, `new Stripe()`, etc. So it tightly couples those objects to the client code  -  the `PaymentController` class. It violates software design principles. For example, **Loose coupling**, **Program to an interface, not an implementation**, etc.
 
 Problem 2: The client code is not encapsulated. Why? Because it is your eternal old friend **CHANGE**. What if the concrete classes' APIs are changed or you need to add a new payment gateway? You then have to modify your client code.
 
@@ -84,11 +86,11 @@ The Factory Method is a software design pattern. It has been categorized into cr
 
 If you understand anything from the definition, that will be great. No problem if you do NOT. I am going to break the definition into pieces so that we can understand it clearly.
 
-**Point 1**: The design pattern defines an interface for creating an object.
+Point 1: The design pattern defines an interface for creating an object.
 
-**Point 2**: The design pattern lets subclasses decide which class to instantiate.
+Point 2: The design pattern lets subclasses decide which class to instantiate.
 
-**Point 3**: Finally, it lets a class defer the instantiation to subclasses.
+Point 3: Finally, what it does, as a whole, is it lets a class defer the instantiation to subclasses.
 
 We will tackle each point to implement the Factory Method. Then we will see how the Factory Method helps move the if-else nested statements from the client code, separate object creation, and design better software.
 
@@ -96,7 +98,7 @@ We will tackle each point to implement the Factory Method. Then we will see how 
 
 **Point 1: Defining an interface for creating an object**
 
-Point 1 says it provides an interface for creating an object. As we are working on the payment gateways, we should have an interface for creating payment gateway objects instead of creating them in the if-else nested statements. So that they do not couple with the client code, the `handle()` method of `PaymentController` method. Let us provide an interface for doing so.
+Point 1 says it provides an interface for creating an object. As we are working on the payment gateways, we should have an interface for creating payment gateway objects instead of creating them in the client code using if-else nested statements. So that they do not couple with the client code, the `handle()` method of `PaymentController` method. Let us provide an interface for doing so.
 
 The point to be noted is that if you are using either **interface** or **abstract method/class**,  you are abstracting something (in our case, we are abstracting object creation). Both do the same thing - abstraction. Put it in your brain.
 
@@ -135,7 +137,7 @@ Here `AbstractPaymentGateway` is an abstract class that provides the abstraction
 
 **Point 2: Letting subclasses decide which class to instantiate**
 
-Notice the `process()` method. It uses the `createPaymentGateway()` factory method to get a payment gateway object to process the payment. But to get the payment gateway object, the `AbstractPaymentGateway` abstract class depends on its subclasses. Since we abstract the object creation.
+Notice the `process()` method above. It uses the `createPaymentGateway()` factory method to get a payment gateway object to process the payment. But to get the payment gateway object, the `AbstractPaymentGateway` abstract class depends on its subclasses. Since we abstract the object creation.
 
 Let us create a subclass `PaymentGateway` that extends the abstract class `AbstractPaymentGateway`. See what it looks like below:
 
@@ -236,18 +238,18 @@ Now it is time to see whether the problems have been solved after applying the F
 
 Proof to problem 1: As the object creations of the payment gateway classes have been moved to another class, so the payment gateway objects do not couple with the client code anymore. So it meets "Loose Coupling".
 
-Notice the `AbstractPaymentGateway` parameter of the constructor of the `PaymentController`. As it is an abstraction for creating payment gateway objects, so it can behave polymorphically. And we can pass any object to the constructor that extends the `AbstractPaymentGateway` abstract class. Thus we implement "Program to an interface, not an implementation".
+Notice the `AbstractPaymentGateway` parameter of the constructor of the `PaymentController`. As it is an abstraction for creating payment gateway objects, so it can behave polymorphically. And we can pass any object to the constructor created from any subclass of the AbstractPaymentGateway abstract class. Thus we implement "Program to an interface, not an implementation".
 
-Proof to problem 2: If any change happens in the concrete classes of payment gateway objects then that will not affect the client code. This applies encapsulation.
+Proof to problem 2: If any change happens in the concrete classes of payment gateway objects then that will not affect the client codeanymore. Because we have encapsulated the object creation to another class. This applies encapsulation.
 
 Proof to problem 3: If we want to add a new payment gateway object, we can do that without modifying the client code. So the client code is now "closed for modification". This conforms to OCP.
 
 Proof to problem 4: The object creation job is now encapsulated in one class. We can reuse the `PaymentGateway` subclass wherever we need it in our app. Now the object creation code is reusable.
 
-Proof to problem 5: The client code, the `handle()` method of `PaymentGateway` class has now less than 20 lines of code (including vertical spaces). This solves Problem 5.
+Proof to problem 5: The client code, the `handle()` method of `PaymentGateway` class has now less than 20 lines of code (including vertical spaces). This solves Problem 5- A function should be small.
 
 ### Using Interface
-What if we wanted to use an interface instead of an abstract class? Nothing! Because both do the same thing - abstraction. I have said this before. This time we would abstract object creation using an interface.
+What if we wanted to use an interface instead of an abstract class? Nothing! But a small difference - an abstract class can have method implementations (as it may define common/basic behaviors/rules that child classes need) where an interface can NOT. But basically, both do the same thing - abstraction. I have said this before. This time we would abstract object creation using an interface.
 
 ```php
 <?php
@@ -291,9 +293,11 @@ class PaymentController
 ```
 
 ### Conclusion
-What we have learned, in this article, is how to apply the Factory Method pattern to specific problems -separating object creation, moving if-else nested statements from client code, etc. 
+What we have learned, in this article, is how to apply the Factory Method pattern to specific problems -separating object creation and moving if-else nested statements from client code. 
 
 Using the if-else nested statements for creating objects in the client code breaks several  software design principles like Loose Coupling, OCP, DRY, etc. To solve this problem we apply the Factory Method design pattern.  It helps move the if-else nested statements to a separate class. By doing this, we make sure only one place to make modifications when the implementation changes.
+
+Follow me here on Github, [Twitter](https://twitter.com/unclexo), [Medium](https://medium.com/@unclexo), and [LinkedIn](https://www.linkedin.com/in/unclexo)
 
 ### References
 1. [Loose Coupling](https://en.wikipedia.org/wiki/Loose_coupling)
