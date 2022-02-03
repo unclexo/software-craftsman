@@ -1,0 +1,259 @@
+![ISP: The Interface Segregation Principle](https://raw.githubusercontent.com/unclexo/software-craftsman/main/assets/solid/isp/interface-segregation-principle.jpeg)
+
+# ISP: The Interface Segregation Principle
+
+ISP stands for Interface Segregation Principle. It is one of the principles of Object-Oriented Design. Robert Cecil 
+Martin¹ (widely known as Uncle Bob) introduces a number of principles in his famous book:
+
+[Agile Software Development, Principles, Patterns, and Practices](https://www.amazon.com/Software-Development-Principles-Patterns-Practices/dp/0135974445)
+
+He describes five OOD principles in this book. They are collectively known as the SOLID Principles. These principles 
+have received wide attention in the software industry. The Interface Segregation Principle is the fourth one of the 
+five principles. Otherwise, “I” of SOLID.
+
+Uncle Bob gives a definition of the Interface Segregation Principle in his book. The definition is as the following:
+
+> Clients should not be forced to depend on methods that they do not use.
+
+What does the definition mean? This means that when client classes are forced to depend on methods that they do **NOT** 
+use, then those client classes are subject to changes to those methods.
+
+If such a thing happens, then client classes need to degenerate those useless methods, but degenerating methods violate 
+the Liskov Substitution Principle. We should avoid such couplings where possible. Let us dig into ISP.
+
+Imagine, we need a simple notification system that will notify users via Email or SMS. As you know, there is an 
+object-oriented design principle called —
+
+> Program to an interface, not an implementation.
+
+The interface actually represents abstraction. Some languages have this feature like PHP, JAVA, etc. When we use 
+interface, we actually represent an abstraction. So ‘Program to an interface’ actually means ‘program to a supertype’. 
+Generally, the supertype is represented via an interface or an abstract class. Keep it in mind, interface and abstract 
+both features represent abstractions.
+
+So we would program to an interface to represent an abstraction, therefore, a supertype. For our notification system, 
+we need an interface, therefore, an abstraction representing how we can deal with notifications. Here is our 
+Notification interface:
+
+```php
+<?php 
+
+interface NotificationInterface
+{
+    /**
+     * Sends emails
+     * 
+     * @param array $data
+     * @return mixed
+     */
+    public function sendEmail(array $data);
+
+    /**
+     * Sends SMSs
+     * 
+     * @param array $data
+     * @return mixed
+     */
+    public function sendSms(array $data);
+}
+```
+What is going on in the code above? According to our demand, we have made an abstraction for our notification system. 
+It has two abstract methods - `sendEmail()`, and `sendSms()`.
+
+**Remember that an interface dictates that its subclasses must implement those methods declared in it.**
+
+As PHP supports interface, so we make this example code using interface. But we could do this using an abstract class 
+too as below:
+
+```php
+<?php
+
+abstract class AbstractNotification
+{
+    /**
+     * Sends emails
+     *
+     * @param array $data
+     * @return mixed
+     */
+    abstract public function sendEmail(array $data);
+
+    /**
+     * Sends SMSs
+     *
+     * @param array $data
+     * @return mixed
+     */
+    abstract public function sendSms(array $data);
+}
+```
+Now we would check whether the `Notification` interface or abstraction conforms to ISP or not. How would we know that? 
+Well, when we would create some derivative classes from the `Notification` interface, then we would be able to see the 
+problem actually.
+
+### Interface Pollution
+Here we will use **ABC Email**, for example, the email sender service for sending emails to the users. So we need to 
+create a client class implementing the `Notification` interface. This client class will be used for sending emails. 
+Look at the code below:
+
+```php
+<?php
+
+class AbcEmailClient implements NotificationInterface
+{
+    /**
+     * Sends emails via SMTP
+     *
+     * @param array $data
+     * @return mixed
+     */    
+    public function sendEmail(array $data) 
+    {
+        // TODO: Implement sendEmail() method via SMTP
+    }
+    
+    // SMTPClient is being forced to implement this method
+    public function sendSms(array $data) 
+    {
+        // Degeneration of sendSms() method
+    }    
+}
+```
+As you can see we are implementing the `Notification` interface, so have to implement methods that the interface 
+dictates. We did it so in the code above. We implemented `AbcEmailClient::sendEmail()` to send emails. Moreover, we 
+had to degenerate a method called `AbcEmailClient::sendSms()`. Notice, our purpose is to only send emails using 
+**ABC Email** the email sender service. Sending SMS is not the task that the `AbcEmailClient` has to do in this case.
+
+If we made a client class for sending SMS, `XyzSmsClient` SMS sender service, for example, that would have to degenerate 
+a method also like `XyzSmsClient::sendEmail()`.
+
+This is an example of interface pollution. That means our Notification interface design has low cohesion. 
+Meaning it has a set of unrelated methods. The `sendEmail()` method sends emails while the `sendSms()` method sends 
+SMSs. Both methods have different tasks. So, their purposes are quite different. That is why they are unrelated.
+
+In the code above, client classes are forced to degenerate methods that they do not need. Doing so `Notification` 
+interface violates the ISP. Well, what is the solution then? As we have a low cohesive interface, therefore, the 
+interface has a set of unrelated methods, we need to break the interface into groups to achieve high cohesion, 
+therefore, interface with deeply related methods.
+
+### Separate Interfaces
+When we go to implement our `Notification` interface design, we have then seen that we need to deal with two different 
+clients — `AbcEmailClient` and `XyzSmsClient`. Separate clients mean separate interfaces. Let us break the design 
+currently we have.
+
+Interface for sending emails:
+
+```php
+<?php
+
+interface EmailNotificationInterface
+{
+    /**
+     * Sends emails
+     * 
+     * @param array $data
+     * @return mixed
+     */
+    public function send(array $data);
+}
+```
+
+Interface for sending SMSs:
+
+```php
+<?php
+
+interface SmsNotificationInterface
+{
+    /**
+     * Sends SMSs
+     * 
+     * @param array $data
+     * @return mixed
+     */
+    public function send(array $data);
+}
+```
+
+Now, we have two separate interfaces. We can implement them with different client classes. No client class will be 
+forced anymore to use methods that the client does not use. **Keep it in mind, separating interfaces does NOT mean 
+that each interface will contain a single method to be implemented**. So an interface can have more than one single 
+method but those methods must be highly related, otherwise, the interface may violate ISP.
+
+Now we would create a client class and try to fake sending emails. Let us do it:
+
+```php
+<?php
+
+class AbcEmailClient implements EmailNotificationInterface
+{
+    /**
+     * Sends emails via ABC Email service
+     *
+     * @param array $data
+     * @return mixed
+     */
+    public function send(array $data)
+    {
+        // TODO: Implement send() method.
+    }
+}
+```
+
+Here we create a client class that implements `EmailNotification` interface. This time our client class is not being 
+forced to use methods that are unrelated to it. Though we have one method to implement in this case, we could have 
+been more related methods. Keep it in mind related methods may not force a client class to be implemented that the 
+client does not need.
+
+```php
+<?php
+
+class EmailNotifier implements NotifierInterface
+{
+    /**
+     * @param array $data
+     * @param EmailNotificationInterface $notifier
+     * @return mixed
+     */
+    public function notify(array $data, EmailNotificationInterface $notifier)
+    {
+        return $notifier->send($data);
+    }
+}
+
+
+// Prepares email client
+$abcEmail = new AbcEmailClient();
+
+// Prepares data for sending email
+$data = [
+    // data...
+];
+
+// Notifies users via emails
+$emailNotification = new EmailNotifier();
+$emailNotification->notify($data, $abcEmail);
+```
+
+So this is one way of respecting ISP. How we did that is explained above. But I would like to show you some UML 
+diagrams so that you can grasp all the things described above at a glance.
+
+Our first design was not ISP compatible. In UML diagram, that looks like the below:
+
+![ISP incompatible UML diagram](https://raw.githubusercontent.com/unclexo/software-craftsman/main/assets/solid/isp/isp-incompatible-uml-diagram.png)
+
+But to be compatible with ISP what we did in the explanation above looks like the following UML diagram:
+
+![ISP compatible UML diagram](https://raw.githubusercontent.com/unclexo/software-craftsman/main/assets/solid/isp/isp-compatible-uml-diagram.png)
+
+ISP deals with the disadvantages of fat interfaces. Therefore, classes that have fat interfaces have low-cohesion. 
+In other words, the interfaces of the class can be broken up into groups of methods. Thereby, each group represents 
+a different set of clients. Thus, some clients use one group of member functions, and other clients use the other 
+groups.
+
+[Download Working Code](https://gist.github.com/unclexo/7f2a7fa9a56403a0ab0b678458da97a7)
+
+### References:
+* [Robert Cecil Martin (Uncle Bob)](https://en.wikipedia.org/wiki/Robert_C._Martin)
+* [Head First Design Patterns](https://www.amazon.com/Head-First-Design-Patterns-Brain-Friendly-ebook/dp/B00AA36RZY)
+* [Agile Software Development, Principles, Patterns, and Practices](https://www.amazon.com/Software-Development-Principles-Patterns-Practices/dp/0135974445)
